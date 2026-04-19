@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { todayIsoLocal, daysAgoIsoLocal } from "@/lib/date"
 
 const OPTIONS = [
   { value: "30d", label: "30 dias" },
@@ -69,22 +70,18 @@ export function getPeriodRange(period: PeriodValue, now = new Date()): {
   prevEndIso: string | null
   days: number | null
 } {
-  const endIso = now.toISOString().slice(0, 10)
+  const endIso = todayIsoLocal(now)
   if (period === "all") {
     return { startIso: null, endIso, prevStartIso: null, prevEndIso: null, days: null }
   }
   const days = period === "30d" ? 30 : period === "90d" ? 90 : 365
-  const start = new Date(now)
-  start.setDate(start.getDate() - days)
-  const prevEnd = new Date(start)
-  prevEnd.setDate(prevEnd.getDate() - 1)
-  const prevStart = new Date(prevEnd)
-  prevStart.setDate(prevStart.getDate() - days + 1)
+  // All offsets derived from São Paulo calendar date, not UTC clock.
+  // prevEnd = day before window start; prevStart = same-length window before that.
   return {
-    startIso: start.toISOString().slice(0, 10),
+    startIso: daysAgoIsoLocal(days, now),
     endIso,
-    prevStartIso: prevStart.toISOString().slice(0, 10),
-    prevEndIso: prevEnd.toISOString().slice(0, 10),
+    prevStartIso: daysAgoIsoLocal(2 * days, now),
+    prevEndIso: daysAgoIsoLocal(days + 1, now),
     days,
   }
 }
