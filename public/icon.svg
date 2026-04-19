@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Tanqi</title>
+  <!-- Rounded squircle container in Tanqi's Electric Cyan primary. -->
+  <rect x="0" y="0" width="512" height="512" rx="128" ry="128" fill="#00D4F0" />
+  <!-- Monogram: abstract lowercase "t" (stem + crossbar) with a floating dot.
+       The dot doubles as the tittle of the "i" in tanqi and as a data /
+       status point. Dark graphite ink reads clearly on cyan at any size. -->
+  <g fill="#0E1015">
+    <!-- Stem -->
+    <rect x="192" y="128" width="64" height="298" rx="32" />
+    <!-- Crossbar -->
+    <rect x="96" y="202" width="234" height="64" rx="32" />
+    <!-- Floating dot / data point -->
+    <circle cx="384" cy="128" r="42" />
+  </g>
+</svg>

@@ -1,0 +1,95 @@
+<!--
+  Tanqi — Confirm Signup email
+  Supabase template: "Confirm signup"
+  Suggested Subject: "Confirme seu e-mail no Tanqi"
+
+  Same shell as magic-link.html. Copy changes only — this one welcomes the
+  user and frames the click as a one-time confirmation, not a login.
+-->
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <title>Confirme seu e-mail no Tanqi</title>
+    <style>
+      body { margin: 0; padding: 0; width: 100% !important; background: #F4F5F7; }
+      a { text-decoration: none; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0E1015 !important; }
+        .tq-card { background: #1C1F28 !important; border-color: #2C303C !important; }
+        .tq-text { color: #FFFFFF !important; }
+        .tq-muted { color: #94A3B8 !important; }
+        .tq-footer { color: #94A3B8 !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#F4F5F7;">
+      <tr>
+        <td align="center" style="padding:40px 16px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="520" style="max-width:520px;">
+            <tr>
+              <td style="padding:0 0 24px 0;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="vertical-align:middle;">
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="background:#00D4F0;border-radius:12px;">
+                        <tr>
+                          <td align="center" valign="middle" width="36" height="36" style="width:36px;height:36px;">
+                            <img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%230E1015%22%3E%3Crect%20x%3D%229%22%20y%3D%226%22%20width%3D%223%22%20height%3D%2214%22%20rx%3D%221.5%22%2F%3E%3Crect%20x%3D%224.5%22%20y%3D%229.5%22%20width%3D%2211%22%20height%3D%223%22%20rx%3D%221.5%22%2F%3E%3Ccircle%20cx%3D%2218%22%20cy%3D%226%22%20r%3D%222%22%2F%3E%3C%2Fsvg%3E" alt="Tanqi" width="22" height="22" style="display:block;" />
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                    <td style="vertical-align:middle;padding-left:12px;">
+                      <span class="tq-text" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:600;letter-spacing:-0.02em;color:#0E1015;">tanqi</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="tq-card" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:20px;padding:40px 32px;">
+                <h1 class="tq-text" style="margin:0 0 16px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Plus Jakarta Sans',sans-serif;font-size:24px;line-height:1.25;font-weight:600;letter-spacing:-0.01em;color:#0E1015;">
+                  Bem-vindo ao Tanqi
+                </h1>
+                <p class="tq-muted" style="margin:0 0 28px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6;color:#555B66;">
+                  Estamos quase lá. Confirme seu e-mail para começar a registrar abastecimentos e acompanhar o custo
+                  real do seu carro.
+                </p>
+
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="border-radius:999px;background:#00D4F0;">
+                      <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:600;color:#0E1015;border-radius:999px;">
+                        Confirmar e-mail
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <p class="tq-muted" style="margin:28px 0 8px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.6;color:#7A8291;">
+                  Se o botão não funcionar, copie e cole este link no navegador:
+                </p>
+                <p style="margin:0;font-family:ui-monospace,SFMono-Regular,'JetBrains Mono',Menlo,monospace;font-size:12px;line-height:1.5;color:#00A9C0;word-break:break-all;">
+                  <a href="{{ .ConfirmationURL }}" style="color:#00A9C0;">{{ .ConfirmationURL }}</a>
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="tq-footer" style="padding:20px 4px 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;line-height:1.6;color:#7A8291;">
+                Se você não criou uma conta no Tanqi, pode ignorar este e-mail.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
