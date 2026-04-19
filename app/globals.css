@@ -1,0 +1,355 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================
+   Tanqi — "Graphite + Electric Cyan"
+   ------------------------------------------------
+   Dark-mode-first premium palette for a broader car-ownership platform.
+   The accent is Electric Cyan — a calm, technical hue that reads as
+   signal, data and intelligent flow. It is NOT a fuel-specific color,
+   which is deliberate: it carries cleanly into maintenance, documents,
+   insurance, and any future ownership surface without repainting the
+   brand.
+
+   Chart tokens are semantic per fuel type today, but the mapping is
+   explicit so they can be reassigned as the product grows:
+     chart-1 = gasolina (cyan — brand accent)
+     chart-2 = etanol   (green)
+     chart-3 = gnv      (teal-blue)
+     chart-4 = diesel   (slate)
+     chart-5 = neutral  (warm)
+
+   Brand color reference (approximate sRGB equivalents of the OKLCH
+   values below — kept here as a sanity check):
+     background  #0E1015    card           #1C1F28
+     card-elev.  #242834    border / input #2C303C
+     text        #FFFFFF    text secondary #94A3B8
+     accent      #00D4F0    accent pressed #00BBDC
+   ============================================ */
+
+:root {
+  /* Light — clean graphite on paper, a DARKER cyan accent.
+     The dark-theme cyan (#00D4F0) is optimized for dark backgrounds; on
+     white it loses too much contrast for small UI. The light-theme accent
+     is deliberately shifted down one stop (~#007B91) so text-primary,
+     small icons, and ring outlines meet WCAG AA/AAA on white. The chart
+     tokens follow the same rule. */
+  --background: oklch(0.985 0.002 240);   /* paper */
+  --foreground: oklch(0.18 0.02 250);     /* graphite 900 */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 250);
+  --card-elevated: oklch(0.97 0.004 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 250);
+  --primary: oklch(0.56 0.14 210);        /* darker cyan for AA on white */
+  --primary-foreground: oklch(0.99 0.004 240);
+  --secondary: oklch(0.96 0.004 240);
+  --secondary-foreground: oklch(0.18 0.02 250);
+  --muted: oklch(0.96 0.004 240);
+  --muted-foreground: oklch(0.44 0.02 250); /* slightly darker for AA */
+  --accent: oklch(0.56 0.14 210);
+  --accent-foreground: oklch(0.99 0.004 240);
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.99 0.004 240);
+  --success: oklch(0.52 0.15 150);
+  --success-foreground: oklch(0.99 0.004 240);
+  --warning: oklch(0.66 0.14 70);
+  --warning-foreground: oklch(0.18 0.02 250);
+  --border: oklch(0.9 0.004 240);
+  --input: oklch(0.9 0.004 240);
+  --ring: oklch(0.56 0.14 210);
+  --chart-1: oklch(0.56 0.14 210);        /* gasolina → darker cyan */
+  --chart-2: oklch(0.52 0.15 150);        /* etanol   → darker green */
+  --chart-3: oklch(0.52 0.12 195);        /* gnv      → teal         */
+  --chart-4: oklch(0.44 0.03 260);        /* diesel   → slate        */
+  --chart-5: oklch(0.62 0.06 80);         /* neutral  → warm sand    */
+  --radius: 0.875rem;
+  --sidebar: oklch(0.98 0.003 240);
+  --sidebar-foreground: oklch(0.18 0.02 250);
+  --sidebar-primary: oklch(0.56 0.14 210);
+  --sidebar-primary-foreground: oklch(0.99 0.004 240);
+  --sidebar-accent: oklch(0.95 0.004 240);
+  --sidebar-accent-foreground: oklch(0.18 0.02 250);
+  --sidebar-border: oklch(0.9 0.004 240);
+  --sidebar-ring: oklch(0.56 0.14 210);
+}
+
+.dark {
+  /* Dark — the hero theme. Charcoal / graphite base, electric cyan accent.
+     Chroma on the neutrals is kept very low so the cyan stays the single
+     spatial cue of interaction; this is what makes data feel like the
+     protagonist instead of the chrome. */
+  --background: oklch(0.155 0.01 255);       /* #0E1015 */
+  --foreground: oklch(1 0 0);                /* #FFFFFF */
+  --card: oklch(0.21 0.012 255);             /* #1C1F28 */
+  --card-foreground: oklch(1 0 0);
+  --card-elevated: oklch(0.245 0.012 255);   /* #242834 */
+  --popover: oklch(0.21 0.012 255);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(0.82 0.14 208);           /* #00D4F0 — electric cyan */
+  --primary-foreground: oklch(0.155 0.01 255);
+  --secondary: oklch(0.255 0.012 255);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.235 0.012 255);
+  --muted-foreground: oklch(0.72 0.028 250); /* #94A3B8 — slate 400 */
+  --accent: oklch(0.82 0.14 208);
+  --accent-foreground: oklch(0.155 0.01 255);
+  --destructive: oklch(0.68 0.2 25);
+  --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.72 0.15 150);
+  --success-foreground: oklch(0.13 0.02 150);
+  --warning: oklch(0.8 0.14 78);
+  --warning-foreground: oklch(0.17 0.02 60);
+  --border: oklch(0.295 0.012 255);          /* #2C303C */
+  --input: oklch(0.295 0.012 255);
+  --ring: oklch(0.82 0.14 208);
+  --chart-1: oklch(0.82 0.14 208);           /* gasolina → cyan (brand) */
+  --chart-2: oklch(0.74 0.15 150);           /* etanol   → green       */
+  --chart-3: oklch(0.7 0.12 195);            /* gnv      → teal-blue   */
+  --chart-4: oklch(0.62 0.03 260);           /* diesel   → slate       */
+  --chart-5: oklch(0.78 0.04 80);            /* neutral  → warm sand   */
+  --sidebar: oklch(0.18 0.012 255);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.82 0.14 208);
+  --sidebar-primary-foreground: oklch(0.155 0.01 255);
+  --sidebar-accent: oklch(0.235 0.012 255);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(0.295 0.012 255);
+  --sidebar-ring: oklch(0.82 0.14 208);
+}
+
+@theme inline {
+  /* Plus Jakarta Sans for UI and headlines — geometric, calm, product-led.
+     JetBrains Mono for numeric data — KPIs, currency, liters, km, charts.
+     Data is meant to feel like product content, not decoration, so the mono
+     face is used whenever a number is the protagonist of its cell. The two
+     CSS variables below are wired to the next/font variables set on <html>. */
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-elevated: var(--card-elevated);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 10px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    /* Plus Jakarta Sans ships with SS and CV alternates; enable tabular figures
+       by default so inline numerics align in tables without needing per-cell
+       overrides. .num-display / .num-inline still add their own emphasis. */
+    font-feature-settings: "cv11" on, "ss01" on;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer utilities {
+  /* Big financial numbers — mono, tabular, tight tracking.
+     JetBrains Mono at -0.02em tracking reads as a technical data face:
+     precise, aligned, not decorative. */
+  .num-display {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    font-feature-settings: "ss01" on, "zero" on;
+  }
+  /* Small inline numbers (prices, kilometers in lists).
+     Uses the sans face with tabular figures — reads as UI, not data cell. */
+  .num-inline {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ----------------------------------------------------------------------- */
+  /* Unified micro-typography for labels. Use these instead of re-typing
+     `text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground`
+     everywhere. The drift between "tracking-wider" and "tracking-wide" and
+     "tracking-[0.08em]" across the codebase gets settled here. */
+  /* ----------------------------------------------------------------------- */
+  .label-micro {
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted-foreground);
+  }
+  .label-section {
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted-foreground);
+  }
+
+  /* Soft elevated surface for hero cards — two low-opacity cyan washes on
+     top of the base card fill. The result is a card that feels lit from the
+     upper-left without resorting to neon gradients.
+
+     Dark mode: the cyan wash is the star of the show, so we keep opacity
+     moderate. Light mode: the same percentages would be invisible on white,
+     so the .dark & variant below boosts dark-mode presence while light stays
+     restrained — cleaner and more "paper". */
+  .surface-elevated {
+    background:
+      radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, var(--primary) 7%, transparent), transparent 60%),
+      radial-gradient(100% 80% at 100% 100%, color-mix(in oklab, var(--primary) 4%, transparent), transparent 60%),
+      var(--card);
+  }
+  .dark .surface-elevated {
+    background:
+      radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, var(--primary) 12%, transparent), transparent 60%),
+      radial-gradient(100% 80% at 100% 100%, color-mix(in oklab, var(--primary) 6%, transparent), transparent 60%),
+      var(--card);
+  }
+
+  /* Hairline divider — lower-contrast separator for inner card sections */
+  .hairline {
+    border-color: color-mix(in oklab, var(--border) 60%, transparent);
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* ----------------------------------------------------------------------- */
+  /* Motion language                                                         */
+  /* ----------------------------------------------------------------------- */
+  /* Tanqi motion is calm and restrained: soft fades, short distances,
+     spring-like easing. Movement must communicate state change without
+     entertaining itself. All motion utilities collapse to instant under
+     prefers-reduced-motion.                                                 */
+  /* ----------------------------------------------------------------------- */
+
+  @keyframes tanqi-card-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes tanqi-pulse-primary {
+    0%, 100% {
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 45%, transparent);
+    }
+    50% {
+      box-shadow: 0 0 0 6px color-mix(in oklab, var(--primary) 0%, transparent);
+    }
+  }
+
+  /* Opt-in card entry: apply to elements that appear as part of fresh data
+     (dashboard reveal, reports mount, newly inserted history items). */
+  .card-enter {
+    animation: tanqi-card-enter 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Subtle primary-tinted ring pulse. Use on a freshly-persisted entity
+     (e.g. just-added refuel card) for up to ~1.2s. */
+  .pulse-primary {
+    animation: tanqi-pulse-primary 1200ms ease-out 2;
+  }
+
+  /* A reduced-motion override that disables all Tanqi-branded motion helpers
+     without needing to strip the classes at the component level. Transforms
+     snap into place and opacity fades are skipped. */
+  @media (prefers-reduced-motion: reduce) {
+    .card-enter,
+    .pulse-primary {
+      animation: none !important;
+    }
+  }
+
+  /* ----------------------------------------------------------------------- */
+  /* Chart theming helpers                                                   */
+  /* ----------------------------------------------------------------------- */
+  /* Chart internals (Recharts) are wired via these class-level selectors so
+     every chart in the product inherits the same cursor, grid, and tooltip
+     treatment — no per-chart overrides. The cursor uses color-mix so it
+     tracks the active --primary across light/dark. */
+  /* ----------------------------------------------------------------------- */
+  .chart-themed .recharts-cartesian-grid line {
+    stroke: var(--border);
+    stroke-opacity: 0.55;
+  }
+  .chart-themed .recharts-cartesian-axis-tick text {
+    fill: var(--muted-foreground);
+    font-size: 11px;
+    letter-spacing: 0.01em;
+  }
+  /* Tooltip cursor (the vertical guide / bar highlight). For bar charts the
+     cursor is a filled rectangle — tint it cyan so the hover state reads as
+     active. For line/area charts the cursor is a stroke — use a softer cyan
+     stroke so the data line stays visually primary. */
+  .chart-themed .recharts-rectangle.recharts-tooltip-cursor {
+    fill: color-mix(in oklab, var(--primary) 10%, transparent);
+  }
+  .chart-themed .recharts-curve.recharts-tooltip-cursor {
+    stroke: color-mix(in oklab, var(--primary) 55%, transparent);
+    stroke-dasharray: 3 3;
+  }
+
+  /* Numeric cells inside chart tooltips should pick up JetBrains Mono with
+     tabular figures so the tooltip reads as a data panel, not UI copy. */
+  .chart-themed [data-slot="chart-tooltip"] .tabular-nums,
+  .chart-themed .recharts-tooltip-wrapper span.tabular-nums {
+    font-family: var(--font-mono);
+    font-feature-settings: "zero" on;
+    letter-spacing: -0.01em;
+  }
+}
