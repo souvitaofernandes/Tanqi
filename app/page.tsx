@@ -35,8 +35,12 @@ export default async function Home() {
 
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-5">
         <TanqiWordmark size="md" />
+        {/* Mobile header keeps only the primary CTA (Criar conta) — the
+            secondary "Entrar" link is redundant because the hero section
+            also renders a "Já tenho conta" button. Hiding it on < sm avoids
+            a cramped two-button cluster on iPhone SE widths. */}
         <nav className="flex items-center gap-2">
-          <Button asChild variant="ghost">
+          <Button asChild variant="ghost" className="hidden sm:inline-flex">
             <Link href="/auth/login">Entrar</Link>
           </Button>
           <Button asChild>

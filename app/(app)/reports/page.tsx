@@ -226,19 +226,27 @@ export default async function ReportsPage({
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 p-4 md:gap-7 md:p-8">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex flex-col gap-1.5">
-          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Relatórios</h1>
-          <p className="text-sm text-muted-foreground">
-            {active.name} ·{" "}
-            {/* Subtitle reads naturally: "<N> abastecimentos <escopo>" with a
-                clean preposition for lifetime vs. window. */}
-            {inPeriod.length} {inPeriod.length === 1 ? "abastecimento" : "abastecimentos"} {periodLabel}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <PeriodSelector value={period} />
+      {/* Toolbar reorganised for phones: on < md the title sits beside the
+          export buttons on the first row and the period chips get their own
+          row below with `overflow-x-auto` so they never wrap into a wall of
+          3+ lines. On desktop the three pieces coexist happily in wide
+          horizontal space, so the stacked layout just reads as two tidy
+          rows — visual consistency without sacrificing phone comfort. */}
+      <header className="flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Relatórios</h1>
+            <p className="text-sm text-muted-foreground">
+              {active.name} ·{" "}
+              {/* Subtitle reads naturally: "<N> abastecimentos <escopo>" with a
+                  clean preposition for lifetime vs. window. */}
+              {inPeriod.length} {inPeriod.length === 1 ? "abastecimento" : "abastecimentos"} {periodLabel}
+            </p>
+          </div>
           <ExportButtons entries={inPeriod} vehicle={active} />
+        </div>
+        <div className="-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:overflow-visible md:px-0 md:pb-0 [&::-webkit-scrollbar]:hidden">
+          <PeriodSelector value={period} />
         </div>
       </header>
 
@@ -276,7 +284,11 @@ export default async function ReportsPage({
             <h2 id="reports-hero-heading" className="sr-only">
               Resumo do período
             </h2>
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            {/* `sm:grid-cols-2` added so landscape phones and small tablets
+                (480–768 px) get 2 columns instead of sitting on 1. Was
+                jumping straight from 1 → 2 (at md) → 4 (at lg), wasting the
+                sm breakpoint. */}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <ComparisonCard
                 label={hasDiscount ? "Total pago" : "Gasto no período"}
                 value={formatBRL(summary.totalSpend)}

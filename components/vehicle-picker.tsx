@@ -47,13 +47,14 @@ export function VehiclePicker({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        {/* `title` surfaces the full vehicle name on hover for users whose
-            nicknames exceed the 220px truncation (e.g. "Honda Fit do meu pai
-            (placa ABC-1234)"). Small polish flagged in the QA audit. */}
+        {/* Progressive max-width: tighter on small phones (iPhone SE, 320 px)
+            so the shell header — wordmark + picker + compact user menu —
+            doesn't overflow. Hover/tap `title` still surfaces the full
+            vehicle nickname for truncated names. */}
         <Button
           variant="outline"
           size="sm"
-          className="max-w-[220px] gap-2"
+          className="max-w-[140px] gap-2 sm:max-w-[180px] md:max-w-[220px]"
           title={active?.name ?? undefined}
         >
           <Car className="size-4 shrink-0 text-muted-foreground" />
