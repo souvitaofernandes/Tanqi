@@ -1,5 +1,6 @@
 import type { FuelEntry } from "./types"
 import { normalizeStation } from "./station-utils"
+import { PRICE_ANOMALY_SIGMA, ODOMETER_JUMP_KM } from "./constants"
 
 export type ValidationWarning = {
   code:
@@ -139,7 +140,7 @@ export function validateEntry(
 
   if (prev && input.odometer >= Number(prev.odometer)) {
     const delta = input.odometer - Number(prev.odometer)
-    if (delta > 2000) {
+    if (delta > ODOMETER_JUMP_KM) {
       warnings.push({
         code: "odometer_far_jump",
         severity: "warning",
@@ -174,13 +175,13 @@ export function validateEntry(
     const sd = Math.sqrt(variance)
     if (sd > 0) {
       const z = (input.price_per_liter - mean) / sd
-      if (z > 2.5) {
+      if (z > PRICE_ANOMALY_SIGMA) {
         warnings.push({
           code: "price_anomaly",
           severity: "warning",
           message: `Preço ${((input.price_per_liter / mean - 1) * 100).toFixed(0)}% acima da sua média histórica.`,
         })
-      } else if (z < -2.5) {
+      } else if (z < -PRICE_ANOMALY_SIGMA) {
         warnings.push({
           code: "price_anomaly",
           severity: "warning",

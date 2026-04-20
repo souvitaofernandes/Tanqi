@@ -1,14 +1,15 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import { cn } from "@/lib/utils"
 import { LayoutDashboard, ListOrdered, Car, PieChart } from "lucide-react"
 import { VehiclePicker } from "./vehicle-picker"
 import { UserMenu } from "./user-menu"
 import { QuickEntryFab } from "./quick-entry-fab"
 import { TanqiWordmark } from "./tanqi-logo"
-import type { FuelEntry, Vehicle } from "@/lib/types"
+import type { Vehicle } from "@/lib/types"
 
 const leftNav = [
   { href: "/dashboard", label: "Início", icon: LayoutDashboard },
@@ -25,20 +26,32 @@ const desktopNav = [
   { href: "/reports", label: "Relatórios", icon: PieChart },
 ]
 
-export function AppShell({
-  children,
-  vehicles,
-  activeVehicleId,
-  userEmail,
-  siblingEntries = [],
-}: {
+type AppShellProps = {
   children: React.ReactNode
   vehicles: Vehicle[]
-  activeVehicleId: string | null
+  defaultVehicleId: string | null
   userEmail: string
-  siblingEntries?: FuelEntry[]
-}) {
+}
+
+export function AppShell(props: AppShellProps) {
+  return (
+    <Suspense fallback={<AppShellSkeleton />}>
+      <AppShellImpl {...props} />
+    </Suspense>
+  )
+}
+
+function AppShellImpl({
+  children,
+  vehicles,
+  defaultVehicleId,
+  userEmail,
+}: AppShellProps) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  // URL param wins over server-side default so the FAB and nav links always
+  // reflect the vehicle the user is currently viewing.
+  const activeVehicleId = searchParams.get("v") ?? defaultVehicleId
   const withVehicleParam = (href: string) =>
     activeVehicleId && href !== "/vehicles" ? `${href}?v=${activeVehicleId}` : href
 
@@ -115,11 +128,7 @@ export function AppShell({
             })}
           </div>
           <div className="flex items-center justify-center px-3">
-            <QuickEntryFab
-              vehicles={vehicles}
-              activeVehicleId={activeVehicleId}
-              siblingEntries={siblingEntries}
-            />
+            <QuickEntryFab vehicles={vehicles} activeVehicleId={activeVehicleId} />
           </div>
           <div className="flex flex-1 items-center justify-around">
             {rightNav.map((item) => {
@@ -142,6 +151,18 @@ export function AppShell({
           </div>
         </div>
       </nav>
+    </div>
+  )
+}
+
+function AppShellSkeleton() {
+  return (
+    <div className="flex min-h-svh bg-background">
+      <aside className="sticky top-0 hidden h-svh w-60 shrink-0 border-r border-sidebar-border bg-sidebar md:flex" />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-20 min-h-16 border-b border-border/80 bg-background/80" />
+        <main className="flex-1 pb-24 md:pb-0" />
+      </div>
     </div>
   )
 }

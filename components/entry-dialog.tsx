@@ -28,6 +28,7 @@ import { useMemo, useState, useTransition, useEffect, useRef } from "react"
 import { createEntry, updateEntry } from "@/lib/actions/entries"
 import { toast } from "sonner"
 import type { FuelEntry, FuelType, Vehicle } from "@/lib/types"
+import { FUEL_LABEL } from "@/lib/types"
 import { Loader2, Plus, Pencil, AlertTriangle, Flame, Info, Ticket, X } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -45,12 +46,7 @@ type Props = {
   siblingEntries?: FuelEntry[]
 }
 
-const FUEL_OPTIONS: { value: FuelType; label: string }[] = [
-  { value: "gasolina", label: "Gasolina" },
-  { value: "etanol", label: "Etanol" },
-  { value: "gnv", label: "GNV" },
-  { value: "diesel", label: "Diesel" },
-]
+const FUEL_OPTIONS = (Object.entries(FUEL_LABEL) as [FuelType, string][]).map(([value, label]) => ({ value, label }))
 
 function parseDecimal(s: string): number {
   if (!s) return NaN

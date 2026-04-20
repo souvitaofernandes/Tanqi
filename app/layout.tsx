@@ -31,7 +31,6 @@ export const metadata: Metadata = {
   description:
     "Tanqi organiza tudo que envolve ter um carro — gastos, consumo, histórico e, em breve, manutenções e documentos — com clareza e sem esforço.",
   applicationName: "Tanqi",
-  generator: "v0.app",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [

@@ -2,6 +2,7 @@ import type { FuelEntry, FuelType, Vehicle } from "./types"
 import { computeSummary, netTotal, sortAsc, type Summary } from "./fuel-utils"
 import { detectBrand, type BrandInfo } from "./station-brand"
 import { currentMonthKeyLocal, dayOfMonthLocal, daysInCurrentMonthLocal } from "./date"
+import { PRICE_ANOMALY_SIGMA } from "./constants"
 
 /* ============================================================================
    Analytics helpers focused on the Reports section.
@@ -119,10 +120,10 @@ export function detectAnomalies(entries: FuelEntry[]): Anomaly[] {
     const variance = prices.reduce((s, v) => s + (v - mean) ** 2, 0) / prices.length
     const stdev = Math.sqrt(variance)
     if (stdev < 0.05) continue // too little variation, skip to avoid false positives
-    const threshold = mean + 2 * stdev
     for (const e of arr) {
       const p = Number(e.price_per_liter)
-      if (p > threshold && mean > 0) {
+      const z = (p - mean) / stdev
+      if (z > PRICE_ANOMALY_SIGMA && mean > 0) {
         const pctOver = ((p - mean) / mean) * 100
         if (pctOver < 8) continue
         out.push({

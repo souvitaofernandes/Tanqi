@@ -1,12 +1,11 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
+import { env } from "@/lib/env"
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  const supabase = createServerClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
@@ -28,12 +27,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
-  const isAuthRoute = pathname.startsWith("/auth")
   const isProtected =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/vehicles") ||
     pathname.startsWith("/entries") ||
-    pathname.startsWith("/reports")
+    pathname.startsWith("/reports") ||
+    pathname.startsWith("/brand")
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone()

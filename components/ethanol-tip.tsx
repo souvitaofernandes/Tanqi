@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import type { FuelEntry } from "@/lib/types"
 import { ethanolVsGasoline } from "@/lib/fuel-utils"
-import { formatBRL, formatNumber } from "@/lib/format"
+import { formatBRL } from "@/lib/format"
 import { Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 

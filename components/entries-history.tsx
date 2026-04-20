@@ -1,6 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { todayIsoLocal, daysAgoIsoLocal } from "@/lib/date"
+import { PRICE_ANOMALY_SIGMA, ODOMETER_JUMP_KM } from "@/lib/constants"
 import type { FuelEntry, FuelType, Vehicle } from "@/lib/types"
 import { FUEL_LABEL } from "@/lib/types"
 import { netTotal } from "@/lib/fuel-utils"
@@ -39,12 +41,18 @@ const FUEL_ORDER: FuelType[] = ["gasolina", "etanol", "gnv", "diesel"]
 
 function periodCutoff(period: PeriodKey): string | null {
   if (period === "all") return null
-  const d = new Date()
-  if (period === "30d") d.setDate(d.getDate() - 30)
-  else if (period === "90d") d.setDate(d.getDate() - 90)
-  else if (period === "6m") d.setMonth(d.getMonth() - 6)
-  else if (period === "1y") d.setFullYear(d.getFullYear() - 1)
-  return d.toISOString().slice(0, 10)
+  if (period === "30d") return daysAgoIsoLocal(30)
+  if (period === "90d") return daysAgoIsoLocal(90)
+  // For month/year offsets, anchor to São Paulo calendar date then subtract.
+  const today = todayIsoLocal()
+  const [y, m, d] = today.split("-").map(Number)
+  if (period === "6m") {
+    const targetMonth = m - 6 <= 0 ? m - 6 + 12 : m - 6
+    const targetYear = m - 6 <= 0 ? y - 1 : y
+    return `${targetYear}-${String(targetMonth).padStart(2, "0")}-${String(d).padStart(2, "0")}`
+  }
+  // 1y
+  return `${y - 1}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`
 }
 
 function monthLabel(key: string): string {
@@ -70,7 +78,7 @@ function computeAnomalies(allEntries: FuelEntry[]): Map<string, RefuelAnomaly> {
     const prev = sortedAsc[i - 1]
     const cur = sortedAsc[i]
     const delta = Number(cur.odometer) - Number(prev.odometer)
-    if (delta > 2000) {
+    if (delta > ODOMETER_JUMP_KM) {
       out.set(cur.id, {
         kind: "odometer_jump",
         message: `Mais de ${delta.toLocaleString("pt-BR")} km desde o último abastecimento`,
@@ -94,7 +102,7 @@ function computeAnomalies(allEntries: FuelEntry[]): Map<string, RefuelAnomaly> {
     if (sd <= 0) continue
     for (const e of list) {
       const z = (Number(e.price_per_liter) - mean) / sd
-      if (Math.abs(z) > 2.5) {
+      if (Math.abs(z) > PRICE_ANOMALY_SIGMA) {
         // Keep odometer_jump as the primary if set; price is a softer signal
         if (!out.has(e.id)) {
           out.set(e.id, {
