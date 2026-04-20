@@ -160,9 +160,6 @@ export default async function ReportsPage({
 
   const range = getPeriodRange(period)
   const inPeriod = filterByRange(allEntries, range.startIso, range.endIso)
-  const inPrev =
-    range.prevStartIso && range.prevEndIso ? filterByRange(allEntries, range.prevStartIso, range.prevEndIso) : []
-
   const summary = computeSummaryInPeriod(allEntries, range.startIso, range.endIso)
   const prevSummary =
     range.prevStartIso && range.prevEndIso

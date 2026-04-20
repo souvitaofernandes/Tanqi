@@ -70,9 +70,8 @@ async function fetchVehicleEntries(
 /**
  * Creates an entry. Runs validation and throws on blocking errors (e.g. odometer going backwards).
  * Station name is normalized against user history to avoid "Shell Centro" vs "shell centro" duplication.
- * If `options.force` is true, non-blocking warnings are ignored (warnings do not throw anyway).
  */
-export async function createEntry(input: EntryInput, options?: { force?: boolean }) {
+export async function createEntry(input: EntryInput) {
   const { supabase, user } = await requireUser()
   ensureValidNumbers(input)
   const siblings = await fetchVehicleEntries(supabase, user.id, input.vehicle_id)

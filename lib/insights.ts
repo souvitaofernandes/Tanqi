@@ -1,6 +1,5 @@
 import type { FuelEntry, Vehicle } from "./types"
 import { computeSummary, groupByMonth, netTotal, sortAsc, type Summary } from "./fuel-utils"
-import { monthKey } from "./format"
 import {
   currentMonthKeyLocal,
   dayOfMonthLocal,
