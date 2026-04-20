@@ -54,7 +54,11 @@ export function StationList({ stations }: { stations: StationStat[] }) {
                     </span>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="font-mono text-sm font-semibold">{formatBRL(s.avgEffectivePrice)}</span>
+                    {/* Use the design-system `num-inline` utility (JetBrains
+                        Mono + tabular figures), not raw `font-mono`, so the
+                        price column aligns with every other numeric cell in
+                        the product. */}
+                    <span className="num-inline text-sm font-semibold">{formatBRL(s.avgEffectivePrice)}</span>
                     {isCheapest ? (
                       <span className="text-[11px] font-medium text-accent">mais barato</span>
                     ) : (

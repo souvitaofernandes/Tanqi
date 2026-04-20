@@ -1,5 +1,6 @@
 import type { FuelEntry } from "./types"
 import { normalizeStation } from "./station-utils"
+import { daysAgoIsoLocal } from "./date"
 
 export type ValidationWarning = {
   code:
@@ -48,10 +49,9 @@ export function validateEntry(
   const others = previous.filter((e) => e.id !== excludeId)
 
   // Date bounds — no future dates beyond tomorrow, no ancient dates.
-  const today = new Date()
-  const tomorrow = new Date(today)
-  tomorrow.setDate(today.getDate() + 1)
-  const tomorrowIso = tomorrow.toISOString().slice(0, 10)
+  // Anchored to São Paulo so users registering late at night (after 21h BRT)
+  // don't hit a false "data no futuro" rejection when they pick "hoje".
+  const tomorrowIso = daysAgoIsoLocal(-1)
   if (input.entry_date > tomorrowIso) {
     warnings.push({
       code: "date_out_of_range",

@@ -5,6 +5,7 @@ import type { FuelEntry, FuelType, Vehicle } from "@/lib/types"
 import { FUEL_LABEL } from "@/lib/types"
 import { netTotal } from "@/lib/fuel-utils"
 import { formatBRL, formatNumber } from "@/lib/format"
+import { daysAgoIsoLocal, todayIsoLocal } from "@/lib/date"
 import { RefuelCard, type RefuelAnomaly } from "./refuel-card"
 import {
   Empty,
@@ -38,13 +39,25 @@ const PERIOD_OPTIONS: { key: PeriodKey; label: string }[] = [
 const FUEL_ORDER: FuelType[] = ["gasolina", "etanol", "gnv", "diesel"]
 
 function periodCutoff(period: PeriodKey): string | null {
+  // All cutoffs are anchored to São Paulo calendar days so the filter behaves
+  // the same whether the user opens the app at 08:00 BRT or 23:00 BRT (using
+  // `toISOString()` on a UTC server would drift by ±3h every night and make
+  // the window boundary jump around).
   if (period === "all") return null
-  const d = new Date()
-  if (period === "30d") d.setDate(d.getDate() - 30)
-  else if (period === "90d") d.setDate(d.getDate() - 90)
-  else if (period === "6m") d.setMonth(d.getMonth() - 6)
-  else if (period === "1y") d.setFullYear(d.getFullYear() - 1)
-  return d.toISOString().slice(0, 10)
+  if (period === "30d") return daysAgoIsoLocal(30)
+  if (period === "90d") return daysAgoIsoLocal(90)
+  if (period === "6m") {
+    // Subtract 6 months in São Paulo calendar space, not UTC.
+    const [y, m, d] = todayIsoLocal().split("-").map(Number)
+    const base = new Date(Date.UTC(y, m - 1 - 6, d))
+    return base.toISOString().slice(0, 10)
+  }
+  if (period === "1y") {
+    const [y, m, d] = todayIsoLocal().split("-").map(Number)
+    const base = new Date(Date.UTC(y - 1, m - 1, d))
+    return base.toISOString().slice(0, 10)
+  }
+  return null
 }
 
 function monthLabel(key: string): string {

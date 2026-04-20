@@ -162,10 +162,14 @@ export function detectAnomalies(entries: FuelEntry[]): Anomaly[] {
     }
   }
 
-  // Big gap detection
+  // Big gap detection — parse both sides in UTC so the diff is never affected
+  // by the server's local timezone (Vercel runs in UTC, but any code path that
+  // imports this module in another zone would silently shift the gap by ±1 day
+  // around DST boundaries). Using "T00:00:00Z" pins both endpoints to the
+  // same anchor so the division by 86_400_000 is exact.
   for (let i = 1; i < sorted.length; i++) {
-    const prev = new Date(sorted[i - 1].entry_date + "T00:00:00")
-    const curr = new Date(sorted[i].entry_date + "T00:00:00")
+    const prev = new Date(sorted[i - 1].entry_date + "T00:00:00Z")
+    const curr = new Date(sorted[i].entry_date + "T00:00:00Z")
     const days = Math.floor((curr.getTime() - prev.getTime()) / 86400000)
     if (days >= 60) {
       const e = sorted[i]
