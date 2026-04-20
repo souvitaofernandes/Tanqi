@@ -1,14 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { LayoutDashboard, ListOrdered, Car, PieChart } from "lucide-react"
 import { VehiclePicker } from "./vehicle-picker"
 import { UserMenu } from "./user-menu"
 import { QuickEntryFab } from "./quick-entry-fab"
 import { TanqiWordmark } from "./tanqi-logo"
-import type { FuelEntry, Vehicle } from "@/lib/types"
+import type { Vehicle } from "@/lib/types"
 
 const leftNav = [
   { href: "/dashboard", label: "Início", icon: LayoutDashboard },
@@ -28,17 +28,19 @@ const desktopNav = [
 export function AppShell({
   children,
   vehicles,
-  activeVehicleId,
+  defaultVehicleId,
   userEmail,
-  siblingEntries = [],
 }: {
   children: React.ReactNode
   vehicles: Vehicle[]
-  activeVehicleId: string | null
+  defaultVehicleId: string | null
   userEmail: string
-  siblingEntries?: FuelEntry[]
 }) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  // URL param wins over server-side default so the FAB and nav links always
+  // reflect the vehicle the user is currently viewing.
+  const activeVehicleId = searchParams.get("v") ?? defaultVehicleId
   const withVehicleParam = (href: string) =>
     activeVehicleId && href !== "/vehicles" ? `${href}?v=${activeVehicleId}` : href
 
@@ -115,11 +117,7 @@ export function AppShell({
             })}
           </div>
           <div className="flex items-center justify-center px-3">
-            <QuickEntryFab
-              vehicles={vehicles}
-              activeVehicleId={activeVehicleId}
-              siblingEntries={siblingEntries}
-            />
+            <QuickEntryFab vehicles={vehicles} activeVehicleId={activeVehicleId} />
           </div>
           <div className="flex flex-1 items-center justify-around">
             {rightNav.map((item) => {
