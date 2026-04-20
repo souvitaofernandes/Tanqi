@@ -15,7 +15,13 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { VehicleDialog } from "@/components/vehicle-dialog"
-import { PeriodSelector, resolvePeriod, getPeriodRange, type PeriodValue } from "@/components/period-selector"
+// Server-safe utilities live in `@/lib/period` (no `"use client"` directive).
+// The `PeriodSelector` React component keeps its own file because it uses
+// client-only hooks like `usePathname`/`useSearchParams`. Importing the pure
+// functions from the client module would crash the server render in Next 16
+// with "Attempted to call resolvePeriod() from the server".
+import { PeriodSelector } from "@/components/period-selector"
+import { resolvePeriod, getPeriodRange, type PeriodValue } from "@/lib/period"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { InsightStack } from "@/components/insight-card"
