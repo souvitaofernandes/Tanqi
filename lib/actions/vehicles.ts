@@ -3,6 +3,13 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
+function dbError(raw: string): Error {
+  if (raw.includes("duplicate key")) return new Error("Já existe um veículo com esses dados.")
+  if (raw.includes("row-level security") || raw.includes("permission denied"))
+    return new Error("Sem permissão para realizar esta operação.")
+  return new Error("Erro ao salvar. Tente novamente.")
+}
+
 export type VehicleInput = {
   name: string
   make?: string | null
@@ -79,11 +86,11 @@ export async function createVehicle(input: VehicleInput) {
     .select()
     .single()
 
-  if (error) throw new Error(error.message)
+  if (error) throw dbError(error.message)
 
   await ensureOneDefault(supabase, user.id)
 
-  revalidatePath("/", "layout")
+  revalidateVehicleRoutes()
   return data
 }
 
@@ -113,25 +120,25 @@ export async function updateVehicle(id: string, input: VehicleInput) {
     .eq("id", id)
     .eq("user_id", user.id)
 
-  if (error) throw new Error(error.message)
+  if (error) throw dbError(error.message)
 
   // Default integrity — after the update there must be exactly one default
   // vehicle (as long as the user has any vehicles at all).
   await ensureOneDefault(supabase, user.id)
 
-  revalidatePath("/", "layout")
+  revalidateVehicleRoutes()
 }
 
 export async function deleteVehicle(id: string) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from("vehicles").delete().eq("id", id).eq("user_id", user.id)
-  if (error) throw new Error(error.message)
+  if (error) throw dbError(error.message)
 
   // If we just deleted the default, promote the oldest remaining vehicle so
   // the app never enters a "no default" state while vehicles still exist.
   await ensureOneDefault(supabase, user.id)
 
-  revalidatePath("/", "layout")
+  revalidateVehicleRoutes()
 }
 
 export async function setDefaultVehicle(id: string) {
@@ -142,6 +149,13 @@ export async function setDefaultVehicle(id: string) {
     .update({ is_default: true })
     .eq("id", id)
     .eq("user_id", user.id)
-  if (error) throw new Error(error.message)
-  revalidatePath("/", "layout")
+  if (error) throw dbError(error.message)
+  revalidateVehicleRoutes()
+}
+
+function revalidateVehicleRoutes() {
+  revalidatePath("/vehicles")
+  revalidatePath("/dashboard")
+  revalidatePath("/reports")
+  revalidatePath("/entries")
 }

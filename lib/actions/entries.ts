@@ -6,6 +6,16 @@ import type { FuelEntry, FuelType } from "@/lib/types"
 import { reconcileStationName } from "@/lib/station-utils"
 import { validateEntry, hasBlockingError } from "@/lib/validation"
 
+function dbError(raw: string): Error {
+  if (raw.includes("duplicate key")) return new Error("Já existe um registro com esses dados.")
+  if (raw.includes("foreign key") || raw.includes("violates foreign key"))
+    return new Error("Veículo não encontrado ou sem permissão.")
+  if (raw.includes("row-level security") || raw.includes("permission denied"))
+    return new Error("Sem permissão para realizar esta operação.")
+  if (raw.includes("check constraint")) return new Error("Valor inválido — verifique os campos e tente novamente.")
+  return new Error("Erro ao salvar. Tente novamente.")
+}
+
 export type EntryInput = {
   vehicle_id: string
   entry_date: string
@@ -53,7 +63,7 @@ async function fetchVehicleEntries(
     .select("*")
     .eq("user_id", userId)
     .eq("vehicle_id", vehicleId)
-  if (error) throw new Error(error.message)
+  if (error) throw dbError(error.message)
   return (data ?? []) as FuelEntry[]
 }
 
@@ -100,7 +110,7 @@ export async function createEntry(input: EntryInput, options?: { force?: boolean
     full_tank: input.full_tank ?? true,
     notes: input.notes ?? null,
   })
-  if (error) throw new Error(error.message)
+  if (error) throw dbError(error.message)
   // Scoped revalidation: only invalidate the routes that actually read fuel
   // entries. Previous `revalidatePath("/", "layout")` discarded every route
   // cache and re-rendered the sidebar/bottom-nav shell on every CRUD, which
@@ -152,7 +162,7 @@ export async function updateEntry(id: string, input: EntryInput) {
     })
     .eq("id", id)
     .eq("user_id", user.id)
-  if (error) throw new Error(error.message)
+  if (error) throw dbError(error.message)
   revalidateEntryRoutes()
   return { warnings: warnings.filter((w) => w.severity === "warning") }
 }
@@ -160,7 +170,7 @@ export async function updateEntry(id: string, input: EntryInput) {
 export async function deleteEntry(id: string) {
   const { supabase, user } = await requireUser()
   const { error } = await supabase.from("fuel_entries").delete().eq("id", id).eq("user_id", user.id)
-  if (error) throw new Error(error.message)
+  if (error) throw dbError(error.message)
   revalidateEntryRoutes()
 }
 
