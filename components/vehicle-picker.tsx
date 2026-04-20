@@ -12,15 +12,36 @@ import {
 import { Car, ChevronsUpDown, Plus } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import type { Vehicle } from "@/lib/types"
 
-export function VehiclePicker({
-  vehicles,
-  activeId,
-}: {
+type VehiclePickerProps = {
   vehicles: Vehicle[]
   activeId: string | null
-}) {
+}
+
+export function VehiclePicker(props: VehiclePickerProps) {
+  return (
+    <Suspense fallback={<VehiclePickerFallback />}>
+      <VehiclePickerImpl {...props} />
+    </Suspense>
+  )
+}
+
+function VehiclePickerFallback() {
+  return (
+    <Button variant="outline" size="sm" className="max-w-[220px] gap-2" disabled>
+      <Car className="size-4 shrink-0 text-muted-foreground" />
+      <span className="truncate text-left font-medium text-muted-foreground">Carregando…</span>
+      <ChevronsUpDown className="ml-auto size-3.5 shrink-0 text-muted-foreground/60" />
+    </Button>
+  )
+}
+
+function VehiclePickerImpl({
+  vehicles,
+  activeId,
+}: VehiclePickerProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()

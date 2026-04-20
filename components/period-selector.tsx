@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import { cn } from "@/lib/utils"
 import { todayIsoLocal, daysAgoIsoLocal } from "@/lib/date"
 
@@ -15,6 +16,39 @@ const OPTIONS = [
 export type PeriodValue = (typeof OPTIONS)[number]["value"]
 
 export function PeriodSelector({ value }: { value: PeriodValue }) {
+  return (
+    <Suspense fallback={<PeriodSelectorFallback value={value} />}>
+      <PeriodSelectorImpl value={value} />
+    </Suspense>
+  )
+}
+
+function PeriodSelectorFallback({ value }: { value: PeriodValue }) {
+  return (
+    <div
+      role="tablist"
+      aria-label="Período"
+      className="inline-flex items-center gap-0.5 rounded-full border border-border bg-muted/40 p-1 text-xs"
+    >
+      {OPTIONS.map((o) => {
+        const active = o.value === value
+        return (
+          <span
+            key={o.value}
+            className={cn(
+              "rounded-full px-3 py-1.5 font-medium",
+              active ? "bg-background text-foreground shadow-xs" : "text-muted-foreground",
+            )}
+          >
+            {o.label}
+          </span>
+        )
+      })}
+    </div>
+  )
+}
+
+function PeriodSelectorImpl({ value }: { value: PeriodValue }) {
   const pathname = usePathname()
   const params = useSearchParams()
 
