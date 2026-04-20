@@ -29,11 +29,24 @@ export function AnomalyList({ anomalies }: { anomalies: Anomaly[] }) {
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <ul className="divide-y divide-border">
+        <ul className="divide-y divide-border" aria-label="Lista de registros fora do padrão">
           {anomalies.map((a) => {
             const Icon = ICONS[a.kind]
+            // A consolidated aria-label so screen readers announce each item
+            // as a single coherent sentence ("Preço acima da média — 14%
+            // acima, em 2026-04-12, R$ 6,29/L") instead of reading each
+            // stacked div as an isolated fragment.
+            const ariaSummary = `${LABEL[a.kind]} — ${a.detail}, em ${a.entry.entry_date}${
+              a.entry.station_name ? `, ${a.entry.station_name}` : ""
+            }, ${formatBRL(Number(a.entry.price_per_liter))} por litro, ${formatLiters(
+              Number(a.entry.liters),
+            )}`
             return (
-              <li key={a.entry.id + a.kind} className="flex items-start gap-3 px-5 py-3">
+              <li
+                key={a.entry.id + a.kind}
+                className="flex items-start gap-3 px-5 py-3"
+                aria-label={ariaSummary}
+              >
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                   <Icon className="size-3.5" />
                 </div>

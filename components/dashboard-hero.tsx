@@ -87,10 +87,15 @@ export function DashboardHero({
               at runtime with a generic "An error occurred in the Server
               Components render" error in production. Keeping every prop
               serializable is what made the dashboard start working again. */}
+          {/* Fluid type from 36 px (small phones) to 72 px (tablet+) via
+              `clamp()`. With the old step ladder `text-[44px] sm:text-6xl
+              md:text-[72px]`, large net totals like "R$ 123.456,78" could
+              overflow a 320 px viewport; the clamp scales continuously so
+              the headline KPI never clips. */}
           <CountUp
             value={projection.spent}
             variant="brl"
-            className="num-display text-[44px] font-semibold leading-none sm:text-6xl md:text-[72px]"
+            className="num-display text-[clamp(2.25rem,11vw,4.5rem)] font-semibold leading-none md:text-[72px]"
           />
         </div>
 

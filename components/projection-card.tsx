@@ -21,7 +21,12 @@ export function ProjectionCard({ projection }: { projection: Projection }) {
       aria-label="Projeção do mês"
       className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 md:p-6"
     >
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      {/* On phones the right-aligned "Meta mensal" block wrapped awkwardly
+          under the left block with a right-edge alignment that lost its
+          anchor. Stacking both blocks left-aligned on mobile and restoring
+          the side-by-side + right-aligned layout on ≥ sm keeps both
+          readable. */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div className="flex items-start gap-3">
           <div
             className={cn(
@@ -44,7 +49,7 @@ export function ProjectionCard({ projection }: { projection: Projection }) {
         </div>
 
         {hasBudget && monthlyBudget ? (
-          <div className="flex flex-col items-end gap-1 text-right">
+          <div className="flex flex-col items-start gap-1 text-left sm:items-end sm:text-right">
             <span className="label-section">Meta mensal</span>
             <span className="num-inline text-sm font-medium">{formatBRL(monthlyBudget)}</span>
             <span className={cn("text-xs font-medium", overBudget ? "text-destructive" : "text-success")}>

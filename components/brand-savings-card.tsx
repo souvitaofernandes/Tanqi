@@ -49,7 +49,17 @@ export function BrandSavingsCard({ brands }: { brands: BrandSavings[] }) {
                     −{formatBRL(b.savings)}
                   </span>
                 </div>
-                <div className="h-1 overflow-hidden rounded-full bg-muted">
+                {/* Progress bars used to be aria-hidden which hid savings
+                    magnitude from screen-reader users entirely. Now exposed
+                    as a proper progressbar relative to the top brand. */}
+                <div
+                  role="progressbar"
+                  aria-label={`Economia relativa em ${b.brand.label}`}
+                  aria-valuenow={Math.round(pct)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  className="h-1 overflow-hidden rounded-full bg-muted"
+                >
                   <div
                     className="h-full rounded-full bg-success"
                     style={{ width: `${pct}%` }}

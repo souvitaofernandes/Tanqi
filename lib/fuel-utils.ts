@@ -116,6 +116,13 @@ export function computeSummaryInPeriod(
 
   // Consumption: walk the full history, count any full-tank→full-tank segment
   // whose END entry falls inside the period.
+  //
+  // FLEX-CAR SAFETY: a segment is ONLY counted when all fills between the
+  // two full tanks share the same fuel type. Mixing gasoline + ethanol inside
+  // one segment would attribute the km driven to both fuels at once, producing
+  // a km/L number that represents neither. For flex users, those mixed
+  // segments are simply skipped — the reported consumption then reflects only
+  // "clean" single-fuel segments, which is the honest answer.
   let consumptionKm = 0
   let consumptionLiters = 0
   let lastFullIdx = -1
@@ -126,12 +133,21 @@ export function computeSummaryInPeriod(
         const endsInPeriod =
           e.entry_date <= toIso && (!fromIso || e.entry_date >= fromIso)
         if (endsInPeriod) {
-          const dist = Number(e.odometer) - Number(sortedAll[lastFullIdx].odometer)
-          let litersBetween = 0
-          for (let j = lastFullIdx + 1; j <= i; j++) litersBetween += Number(sortedAll[j].liters)
-          if (dist > 0 && litersBetween > 0) {
-            consumptionKm += dist
-            consumptionLiters += litersBetween
+          let pureFuel = true
+          for (let j = lastFullIdx + 1; j <= i; j++) {
+            if (sortedAll[j].fuel_type !== e.fuel_type) {
+              pureFuel = false
+              break
+            }
+          }
+          if (pureFuel) {
+            const dist = Number(e.odometer) - Number(sortedAll[lastFullIdx].odometer)
+            let litersBetween = 0
+            for (let j = lastFullIdx + 1; j <= i; j++) litersBetween += Number(sortedAll[j].liters)
+            if (dist > 0 && litersBetween > 0) {
+              consumptionKm += dist
+              consumptionLiters += litersBetween
+            }
           }
         }
       }
@@ -168,8 +184,11 @@ export function computeSummary(entries: FuelEntry[]): Summary {
   const last = sorted[sorted.length - 1]
   const kmTraveled = Math.max(0, Number(last.odometer) - Number(first.odometer))
 
-  // Consumption: between full-tank entries. Sum liters between two consecutive full tanks,
-  // divide distance by those liters (excluding the first full tank's liters).
+  // Consumption: between full-tank entries. Sum liters between two consecutive
+  // full tanks and divide distance by those liters (excluding the first full
+  // tank's liters). Mixed-fuel segments are skipped — see computeSummaryInPeriod
+  // for the rationale; this mirrors that behavior so a single-fuel and
+  // multi-fuel user both get honest km/L numbers.
   let consumptionKm = 0
   let consumptionLiters = 0
   let lastFullIdx = -1
@@ -177,12 +196,21 @@ export function computeSummary(entries: FuelEntry[]): Summary {
     const e = sorted[i]
     if (e.full_tank) {
       if (lastFullIdx >= 0) {
-        const dist = Number(e.odometer) - Number(sorted[lastFullIdx].odometer)
-        let litersBetween = 0
-        for (let j = lastFullIdx + 1; j <= i; j++) litersBetween += Number(sorted[j].liters)
-        if (dist > 0 && litersBetween > 0) {
-          consumptionKm += dist
-          consumptionLiters += litersBetween
+        let pureFuel = true
+        for (let j = lastFullIdx + 1; j <= i; j++) {
+          if (sorted[j].fuel_type !== e.fuel_type) {
+            pureFuel = false
+            break
+          }
+        }
+        if (pureFuel) {
+          const dist = Number(e.odometer) - Number(sorted[lastFullIdx].odometer)
+          let litersBetween = 0
+          for (let j = lastFullIdx + 1; j <= i; j++) litersBetween += Number(sorted[j].liters)
+          if (dist > 0 && litersBetween > 0) {
+            consumptionKm += dist
+            consumptionLiters += litersBetween
+          }
         }
       }
       lastFullIdx = i

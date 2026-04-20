@@ -4,16 +4,13 @@ import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { cn } from "@/lib/utils"
-import { todayIsoLocal, daysAgoIsoLocal } from "@/lib/date"
+import { PERIOD_OPTIONS, type PeriodValue } from "@/lib/period"
 
-const OPTIONS = [
-  { value: "30d", label: "30 dias" },
-  { value: "90d", label: "90 dias" },
-  { value: "365d", label: "12 meses" },
-  { value: "all", label: "Tudo" },
-] as const
-
-export type PeriodValue = (typeof OPTIONS)[number]["value"]
+// Re-export the type for any legacy callers that still import it from here.
+// Pure functions (`resolvePeriod`, `getPeriodRange`) were moved to `@/lib/period`
+// so Server Components can import them — this file keeps ONLY the interactive
+// React component, which is the only reason this module is marked client.
+export type { PeriodValue }
 
 export function PeriodSelector({ value }: { value: PeriodValue }) {
   return (
@@ -30,7 +27,7 @@ function PeriodSelectorFallback({ value }: { value: PeriodValue }) {
       aria-label="Período"
       className="inline-flex items-center gap-0.5 rounded-full border border-border bg-muted/40 p-1 text-xs"
     >
-      {OPTIONS.map((o) => {
+      {PERIOD_OPTIONS.map((o) => {
         const active = o.value === value
         return (
           <span
@@ -54,6 +51,9 @@ function PeriodSelectorImpl({ value }: { value: PeriodValue }) {
 
   function hrefFor(next: PeriodValue) {
     const sp = new URLSearchParams(params.toString())
+    // Default is "365d", so we drop the param in that case for prettier URLs.
+    // Every other value (including "all") is persisted so shared links always
+    // reproduce what the sender is looking at.
     if (next === "365d") sp.delete("period")
     else sp.set("period", next)
     const qs = sp.toString()
@@ -66,7 +66,7 @@ function PeriodSelectorImpl({ value }: { value: PeriodValue }) {
       aria-label="Período"
       className="inline-flex items-center gap-0.5 rounded-full border border-border bg-muted/40 p-1 text-xs"
     >
-      {OPTIONS.map((o) => {
+      {PERIOD_OPTIONS.map((o) => {
         const active = o.value === value
         return (
           <Link
@@ -87,35 +87,4 @@ function PeriodSelectorImpl({ value }: { value: PeriodValue }) {
       })}
     </div>
   )
-}
-
-export function resolvePeriod(raw: string | undefined): PeriodValue {
-  if (raw === "30d" || raw === "90d" || raw === "all") return raw
-  return "365d"
-}
-
-/**
- * Returns ISO date (YYYY-MM-DD) boundaries for a period, and the same-duration previous window.
- */
-export function getPeriodRange(period: PeriodValue, now = new Date()): {
-  startIso: string | null
-  endIso: string
-  prevStartIso: string | null
-  prevEndIso: string | null
-  days: number | null
-} {
-  const endIso = todayIsoLocal(now)
-  if (period === "all") {
-    return { startIso: null, endIso, prevStartIso: null, prevEndIso: null, days: null }
-  }
-  const days = period === "30d" ? 30 : period === "90d" ? 90 : 365
-  // All offsets derived from São Paulo calendar date, not UTC clock.
-  // prevEnd = day before window start; prevStart = same-length window before that.
-  return {
-    startIso: daysAgoIsoLocal(days, now),
-    endIso,
-    prevStartIso: daysAgoIsoLocal(2 * days, now),
-    prevEndIso: daysAgoIsoLocal(days + 1, now),
-    days,
-  }
 }

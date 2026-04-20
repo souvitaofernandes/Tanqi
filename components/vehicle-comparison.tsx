@@ -51,10 +51,14 @@ export function VehicleComparison({
                   </div>
                   <span className="num-inline shrink-0 text-sm font-semibold">{formatBRL(r.netSpend)}</span>
                 </div>
+                {/* A vehicle with a single entry has no km traveled yet, so
+                    `costPerKm === 0`. Show an em-dash instead of the
+                    misleading "R$ 0,00/km" — this matches how "Preço /L"
+                    already handles missing data. */}
                 <div className="grid grid-cols-3 gap-3 text-[11px]">
                   <Metric label="Preço /L" value={r.avgEffectivePrice > 0 ? formatBRL(r.avgEffectivePrice) : "—"} />
                   <Metric label="Consumo" value={formatKmPerLiter(r.avgConsumption)} />
-                  <Metric label="Custo /km" value={formatPerKm(r.costPerKm)} />
+                  <Metric label="Custo /km" value={r.costPerKm > 0 ? formatPerKm(r.costPerKm) : "—"} />
                 </div>
               </li>
             )

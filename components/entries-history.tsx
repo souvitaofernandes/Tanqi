@@ -40,19 +40,24 @@ const PERIOD_OPTIONS: { key: PeriodKey; label: string }[] = [
 const FUEL_ORDER: FuelType[] = ["gasolina", "etanol", "gnv", "diesel"]
 
 function periodCutoff(period: PeriodKey): string | null {
+  // All cutoffs are anchored to São Paulo calendar days so the filter behaves
+  // the same whether the user opens the app at 08:00 BRT or 23:00 BRT (using
+  // `toISOString()` on a UTC server would drift by ±3h every night and make
+  // the window boundary jump around).
   if (period === "all") return null
   if (period === "30d") return daysAgoIsoLocal(30)
   if (period === "90d") return daysAgoIsoLocal(90)
-  // For month/year offsets, anchor to São Paulo calendar date then subtract.
-  const today = todayIsoLocal()
-  const [y, m, d] = today.split("-").map(Number)
   if (period === "6m") {
-    const targetMonth = m - 6 <= 0 ? m - 6 + 12 : m - 6
-    const targetYear = m - 6 <= 0 ? y - 1 : y
-    return `${targetYear}-${String(targetMonth).padStart(2, "0")}-${String(d).padStart(2, "0")}`
+    const [y, m, d] = todayIsoLocal().split("-").map(Number)
+    const base = new Date(Date.UTC(y, m - 1 - 6, d))
+    return base.toISOString().slice(0, 10)
   }
-  // 1y
-  return `${y - 1}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`
+  if (period === "1y") {
+    const [y, m, d] = todayIsoLocal().split("-").map(Number)
+    const base = new Date(Date.UTC(y - 1, m - 1, d))
+    return base.toISOString().slice(0, 10)
+  }
+  return null
 }
 
 function monthLabel(key: string): string {

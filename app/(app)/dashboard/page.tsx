@@ -142,10 +142,14 @@ export default async function DashboardPage({
         ]}
       />
 
-      {/* Last refuel + best station + savings (when user uses coupons) */}
+      {/* Last refuel + best station + savings (when user uses coupons).
+          Using `lg` for the 3-up breakpoint instead of `xl` so tablets in
+          the 1024–1280 px range get the 3-column layout — at `xl` those
+          tablets were stuck on 2 columns with an orphan card wrapping
+          below. */}
       <div
         className={`grid gap-3 md:gap-5 ${
-          hasSavings && bestStation ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2"
+          hasSavings && bestStation ? "md:grid-cols-2 lg:grid-cols-3" : "md:grid-cols-2"
         }`}
       >
         <LastRefuelCard entry={lastEntry} />
