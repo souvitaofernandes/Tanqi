@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { todayIsoLocal, daysAgoIsoLocal } from "@/lib/date"
-import { PRICE_ANOMALY_SIGMA } from "@/lib/constants"
+import { PRICE_ANOMALY_SIGMA, ODOMETER_JUMP_KM } from "@/lib/constants"
 import type { FuelEntry, FuelType, Vehicle } from "@/lib/types"
 import { FUEL_LABEL } from "@/lib/types"
 import { netTotal } from "@/lib/fuel-utils"
@@ -78,7 +78,7 @@ function computeAnomalies(allEntries: FuelEntry[]): Map<string, RefuelAnomaly> {
     const prev = sortedAsc[i - 1]
     const cur = sortedAsc[i]
     const delta = Number(cur.odometer) - Number(prev.odometer)
-    if (delta > 2000) {
+    if (delta > ODOMETER_JUMP_KM) {
       out.set(cur.id, {
         kind: "odometer_jump",
         message: `Mais de ${delta.toLocaleString("pt-BR")} km desde o último abastecimento`,

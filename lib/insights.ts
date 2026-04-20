@@ -1,5 +1,6 @@
 import type { FuelEntry, Vehicle } from "./types"
 import { computeSummary, groupByMonth, netTotal, sortAsc, type Summary } from "./fuel-utils"
+import { formatBRL } from "./format"
 import {
   currentMonthKeyLocal,
   dayOfMonthLocal,
@@ -23,10 +24,6 @@ function pctChange(curr: number, prev: number): number | null {
 
 function fmtPct(n: number, digits = 0): string {
   return `${n >= 0 ? "+" : ""}${(n * 100).toFixed(digits)}%`
-}
-
-function fmtBRL(n: number): string {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n)
 }
 
 function monthLabel(k: string): string {
@@ -243,7 +240,7 @@ export function buildInsights(
         kind: "negative",
         icon: "target",
         title: `Projeção acima da meta em ${fmtPct(pct - 1, 0)}`,
-        description: `Ritmo atual leva a ${fmtBRL(projection.projected)} — sua meta é ${fmtBRL(vehicle.monthly_budget)}.`,
+        description: `Ritmo atual leva a ${formatBRL(projection.projected)} — sua meta é ${formatBRL(vehicle.monthly_budget)}.`,
       })
     } else if (projection.spent / vehicle.monthly_budget >= 0.8 && pct <= 1.05) {
       insights.push({
@@ -259,7 +256,7 @@ export function buildInsights(
         kind: "positive",
         icon: "target",
         title: "No ritmo certo",
-        description: `Projeção de ${fmtBRL(projection.projected)} — dentro da meta de ${fmtBRL(vehicle.monthly_budget)}.`,
+        description: `Projeção de ${formatBRL(projection.projected)} — dentro da meta de ${formatBRL(vehicle.monthly_budget)}.`,
       })
     }
   }
@@ -325,7 +322,7 @@ export function buildInsights(
       id: "coupon-savings",
       kind: "positive",
       icon: "price-tag",
-      title: `Você economizou ${fmtBRL(monthDiscount)} com cupons`,
+      title: `Você economizou ${formatBRL(monthDiscount)} com cupons`,
       description:
         pct > 0
           ? `Isso é ${(pct * 100).toFixed(0)}% a menos no gasto bruto do mês.`
@@ -367,7 +364,7 @@ export function buildHistoricalInsights(entries: FuelEntry[]): Insight[] {
       id: "total-savings",
       kind: "positive",
       icon: "price-tag",
-      title: `Economizou ${fmtBRL(totalDiscount)} com cupons`,
+      title: `Economizou ${formatBRL(totalDiscount)} com cupons`,
       description: `Em ${couponEntries} ${couponEntries === 1 ? "abastecimento" : "abastecimentos"} com desconto.`,
     })
   }
@@ -379,14 +376,14 @@ export function buildHistoricalInsights(entries: FuelEntry[]): Insight[] {
       kind: "positive",
       icon: "trend-down",
       title: `Mês mais econômico: ${monthLabel(best.month)}`,
-      description: `Gasto de ${fmtBRL(best.spend)}.`,
+      description: `Gasto de ${formatBRL(best.spend)}.`,
     })
     out.push({
       id: "worst-month",
       kind: "negative",
       icon: "trend-up",
       title: `Mês mais caro: ${monthLabel(worst.month)}`,
-      description: `Gasto de ${fmtBRL(worst.spend)}.`,
+      description: `Gasto de ${formatBRL(worst.spend)}.`,
     })
   }
 
@@ -399,7 +396,7 @@ export function buildHistoricalInsights(entries: FuelEntry[]): Insight[] {
         kind: "neutral",
         icon: "gauge",
         title: `${fuel[0].toUpperCase() + fuel.slice(1)}: ${c.kmPerLiter.toFixed(1)} km/L`,
-        description: `Custo médio de ${fmtBRL(c.costPerKm)}/km.`,
+        description: `Custo médio de ${formatBRL(c.costPerKm)}/km.`,
       })
     }
   }
@@ -407,17 +404,3 @@ export function buildHistoricalInsights(entries: FuelEntry[]): Insight[] {
   return out
 }
 
-/**
- * Compares multiple vehicles side by side.
- */
-export function compareVehicles(
-  vehicles: Vehicle[],
-  entriesByVehicle: Record<string, FuelEntry[]>,
-): Array<{
-  vehicle: Vehicle
-  summary: Summary
-}> {
-  return vehicles
-    .map((v) => ({ vehicle: v, summary: computeSummary(entriesByVehicle[v.id] ?? []) }))
-    .sort((a, b) => (b.summary.entriesCount || 0) - (a.summary.entriesCount || 0))
-}

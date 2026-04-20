@@ -1,6 +1,6 @@
 import type { FuelEntry } from "./types"
 import { normalizeStation } from "./station-utils"
-import { PRICE_ANOMALY_SIGMA } from "./constants"
+import { PRICE_ANOMALY_SIGMA, ODOMETER_JUMP_KM } from "./constants"
 
 export type ValidationWarning = {
   code:
@@ -140,7 +140,7 @@ export function validateEntry(
 
   if (prev && input.odometer >= Number(prev.odometer)) {
     const delta = input.odometer - Number(prev.odometer)
-    if (delta > 2000) {
+    if (delta > ODOMETER_JUMP_KM) {
       warnings.push({
         code: "odometer_far_jump",
         severity: "warning",
